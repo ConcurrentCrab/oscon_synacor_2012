@@ -1,3 +1,5 @@
+//go:build ignore
+
 package main
 
 import (
@@ -48,7 +50,14 @@ func machine(prog []uint16) {
 		}
 		return mem[n] // get register value
 	}
+	dbgmd := false
 	for {
+		if dbgmd {
+			switch mem[pi] {
+			case op_call:
+				fmt.Fprintf(os.Stderr, " / mem[%v] = %v .. %v\n", pi, mem[pi], mem[pi+1:pi+4])
+			}
+		}
 		ins := mem[pi]
 		pi++
 		switch ins {
@@ -151,6 +160,14 @@ func machine(prog []uint16) {
 			pi += 1
 			var c rune
 			fmt.Scanf("%c", &c)
+			if c == '%' {
+				fmt.Scanf("%s", nil)
+				dbgmd = !dbgmd
+			}
+			if c == '+' {
+				fmt.Scanf("%s", nil)
+				mem[len(mem)-1] = 1
+			}
 			if c == '\r' { // windows hack to fix CR
 				fmt.Scanf("%c", &c)
 				c = '\n'
